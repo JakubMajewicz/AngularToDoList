@@ -1,0 +1,165 @@
+<script src="https://kit.fontawesome.com/7b37168ae1.js" crossorigin="anonymous"></script>
+<div class="row d-flex justify-content-center container" id="main-container">
+    <div class="col-md-8">
+      <div class="card-hover-shadow-2x mb-3 card">
+        <div class="card-header-tab card-header" id="menu">
+          <div class="card-header-title font-size-lg text-capitalize font-weight-normal"><i
+              class="fa fa-tasks"></i>&nbsp;To Do List</div>
+              <div class="search-box">
+               <button class="btn-search"><i class="fa fa-search"></i></button>
+               <input type="text" class="input-search" name="filterSearch" [(ngModel)]="filterText" placeholder="Search by task name">
+             </div>
+              <button class="btn btn-primary" (click)="openAddModal('status')">Http status</button>
+        </div>
+        <div class="scroll-area-sm">
+            <div style="position: static;" class="ps ps--active-y">
+              <div class="ps-content">
+                <ul class=" list-group list-group-flush">
+                  <li *ngFor="let task of filteredTasks | searchFilter:filterText" class="list-group-item">
+                    <div class="widget-content p-0">
+                      <div class="widget-content-wrapper">
+                        <div class="widget-content-left mr-2">
+                        </div>
+                        <div class="widget-content-left">
+                          <div class="widget-heading" (click)="openModal(task, 'description')" id="task">{{task.task_name}}</div>
+                        </div>
+                      <div class="widget-content-right">
+                        <button class="border-0 btn-transition btn btn-outline-primary" (click)="openModal(task, 'edit')">
+                            <i class="fa fa-pencil"></i></button>
+                          <button class="border-0 btn-transition btn btn-outline-danger" (click)="openModal(task, 'delete')">
+                         <i class="fa fa-trash"></i> 
+                        </button>
+                      </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>             
+            </div>
+        </div>
+        <div class="d-block text-right card-footer">
+          <button class="btn btn-primary" (click)="openAddModal('add')">Add Task</button></div>
+      </div>
+    </div>
+    </div>
+
+    <!---Modal add-->
+    <div class="modal fade" id="addTaskModal" tabindex="-1" role="dialog" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+           <div class="modal-header">
+              <h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+              </button>
+           </div>
+           <div class="modal-body">
+              <form #addForm="ngForm" (ngSubmit)="onAddTask(addForm)">
+              <div class="form-group">
+                 <label for="task_name">Task name</label>
+                 <input type="text" ngModel name="task_name" class="form-control" id="task_name" placeholder="Task name" required>
+              </div>
+              <div class="form-group">
+                 <label for="description">Description</label>
+                 <input type="text" ngModel name="description" class="form-control" id="description" placeholder="Description" required>
+              </div> 
+              <div class="modal-footer">
+                 <button type="button" id="add-task-form" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                 <button [disabled]="addForm.invalid" type="submit" class="btn btn-primary" >Save task</button>
+              </div>
+              </form>
+           </div>
+        </div>
+      </div>
+      </div>
+
+      <!--- Modal update -->>
+      <div class="modal fade" id="updateTaskModal" tabindex="-1" role="dialog" aria-labelledby="taskEditModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+           <div class="modal-content">
+              <div class="modal-header">
+                 <h5 class="modal-title" id="updateTaskModalLabel">Edit Task </h5>
+                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                 <span aria-hidden="true">&times;</span>
+                 </button>
+              </div>
+              <div class="modal-body">
+                 <form #editForm="ngForm">
+                    <div class="form-group">
+                       <label for="task_name">Task name</label>
+                       <input type="text" ngModel="{{oneTask?.task_name}}" name="task_name" class="form-control" id="task_name" placeholder="Task name">
+                    </div>
+                    <div class="form-group">
+                       <label for="description">Description</label>
+                       <input type="text" ngModel="{{oneTask?.description}}" name="description" class="form-control" id="description" placeholder="Description">
+                    </div>
+                    <div class="modal-footer">
+                       <button type="button" id="edit-task-form" data-dismiss="modal" class="btn btn-secondary">Close</button>
+                       <button (click)="onEditTask(idTask, editForm.value)" data-dismiss="modal" class="btn btn-primary" >Save changes</button>
+                    </div>
+                 </form>
+              </div>
+           </div>
+        </div>
+      </div>
+
+      <!--- Modal description-->>
+      <div class="modal fade" id="descriptionModal" tabindex="-1" role="dialog" aria-labelledby="descriptionModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+           <div class="modal-content">
+              <div class="modal-header">
+                 <h5 class="modal-title" id="descriptionModalLabel">{{oneTask?.task_name}}</h5>
+                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                 <span aria-hidden="true">&times;</span>
+                 </button>
+              </div>
+              <div class="modal-body">
+              <p>{{oneTask?.description}}</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" id="description-form" data-dismiss="modal" class="btn btn-primary">OK</button>
+             </div>
+           </div>
+        </div>
+      </div>
+      
+      <!-- Modal delete -->
+      <div class="modal fade" id="deleteTaskModal" tabindex="-1" role="dialog" aria-labelledby="deleteTaskModelLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+           <div class="modal-content">
+              <div class="modal-header">
+                 <h5 class="modal-title" id="deleteModelLabel">Delete Task</h5>
+                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                 <span aria-hidden="true">&times;</span>
+                 </button>
+              </div>
+              <div class="modal-body">
+                 <p>Are you sure you want to delete this task?</p>
+                 <div class="modal-footer">
+                    <button type="button" id="delete-task-form" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <button (click)="onDeleteTask(oneTask)" class="btn btn-danger" data-dismiss="modal">Yes</button>
+                 </div>
+              </div>
+           </div>
+        </div>
+      </div>
+
+      <!--- Modal http-->>
+      <div class="modal fade" id="httpModal" tabindex="-1" role="dialog" aria-labelledby="httpModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+           <div class="modal-content">
+              <div class="modal-header">
+                 <h5 class="modal-title" id="descriptionModalLabel">HTTP Status</h5>
+                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                 <span aria-hidden="true">&times;</span>
+                 </button>
+              </div>
+              <div class="modal-body">
+              <p *ngFor="let status of status | keyvalue">{{status?.key}} : {{status?.value}}</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" id="http-form" data-dismiss="modal" class="btn btn-primary">OK</button>
+             </div>
+           </div>
+        </div>
+      </div>
